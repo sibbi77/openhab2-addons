@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="ecotouch"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="geo">
+		<label>Waterkotte EcoTouch Geo</label>
+		<description>Waterkotte EcoTouch Geo heat pump</description>
+		<category>HVAC</category>
+
+		<channels>
+            <channel id="temperature_outside" typeId="type-temperature_outside" />
+            <channel id="temperature_outside_1h" typeId="type-temperature_outside_1h" />
+            <channel id="temperature_outside_24h" typeId="type-temperature_outside_24h" />
+		</channels>
+
+		<config-description>
+            <parameter name="ip" type="text" required="true">
+                <label>IP address / hostname of the heat pump</label>
+                <description>Enter the IP address or the hostname of the EcoTouch display unit</description>
+            </parameter>
+            <parameter name="username" type="text" required="true">
+                <label>Username for login</label>
+                <description>Since Waterkotte Display software version 1.6.xx, the username default value is waterkotte. Prior to that, the username default was admin</description>
+            </parameter>
+            <parameter name="password" type="text" required="true">
+                <label>Password for login</label>
+                <description>Since Waterkotte Display software version 1.6.xx, the password default value is waterkotte. Prior to that, the password default was wtkadmin</description>
+            </parameter>
+		</config-description>
+
+	</thing-type>
+
+    <thing-type id="air">
+        <label>Waterkotte EcoTouch Air</label>
+        <description>Waterkotte EcoTouch Air heat pump</description>
+        <category>HVAC</category>
+
+        <channels>
+            <channel id="temperature_outside" typeId="type-temperature_outside" />
+            <channel id="temperature_outside_1h" typeId="type-temperature_outside_1h" />
+            <channel id="temperature_outside_24h" typeId="type-temperature_outside_24h" />
+        </channels>
+
+        <config-description>
+            <parameter name="ip" type="text" required="true">
+                <label>IP address / hostname of the heat pump</label>
+                <description>Enter the IP address or the hostname of the EcoTouch display unit</description>
+            </parameter>
+            <parameter name="username" type="text" required="true">
+                <label>Username for login</label>
+                <description>Since Waterkotte Display software version 1.6.xx, the username default value is waterkotte. Prior to that, the username default was admin</description>
+            </parameter>
+            <parameter name="password" type="text" required="true">
+                <label>Password for login</label>
+                <description>Since Waterkotte Display software version 1.6.xx, the password default value is waterkotte. Prior to that, the password default was wtkadmin</description>
+            </parameter>
+        </config-description>
+
+    </thing-type>
+    
+	<channel-type id="type-temperature_outside">
+		<item-type>Number:Temperature</item-type>
+		<label>Temperature Outside</label>
+		<description>The current outside temperature</description>
+		<state readOnly="true" pattern="%.1f %unit%" />
+	</channel-type>
+    <channel-type id="type-temperature_outside_1h">
+        <item-type>Number:Temperature</item-type>
+        <label>Temperature Outside 1h Average</label>
+        <description>The outside temperature averaged over one hour</description>
+        <state readOnly="true" pattern="%.1f %unit%" />
+    </channel-type>
+    <channel-type id="type-temperature_outside_24h">
+        <item-type>Number:Temperature</item-type>
+        <label>Temperature Outside 24h Average</label>
+        <description>The outside temperature averaged over one day</description>
+        <state readOnly="true" pattern="%.1f %unit%" />
+    </channel-type>
+
+</thing:thing-descriptions>
