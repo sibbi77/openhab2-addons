@@ -22,5 +22,8 @@ public class EcoTouchConfiguration {
     /**
      * Sample configuration parameter. Replace with your own.
      */
-    public String config1;
+    public String ip;
+    public String username;
+    public String password;
+    public Integer refresh;
 }

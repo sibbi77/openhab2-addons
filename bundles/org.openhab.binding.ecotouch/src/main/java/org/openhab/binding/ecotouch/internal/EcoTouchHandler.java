@@ -12,18 +12,28 @@
  */
 package org.openhab.binding.ecotouch.internal;
 
-import static org.openhab.binding.ecotouch.internal.EcoTouchBindingConstants.*;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.core.library.types.DecimalType;
+import org.eclipse.smarthome.core.library.types.OnOffType;
+import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.eclipse.smarthome.core.library.unit.SmartHomeUnits.*;
 
 /**
  * The {@link EcoTouchHandler} is responsible for handling commands, which are
@@ -34,52 +44,109 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class EcoTouchHandler extends BaseThingHandler {
 
+    // List of Configuration constants
+    // public static final String IP = "ip";
+    // public static final String USERNAME = "username";
+    // public static final String PASSWORD = "password";
+
+    private @Nullable EcoTouchConnector connector = null;
+
     private final Logger logger = LoggerFactory.getLogger(EcoTouchHandler.class);
 
-    private @Nullable EcoTouchConfiguration config;
+    private @Nullable EcoTouchConfiguration config = null;
+    
+    private @Nullable ScheduledFuture<?> refreshJob = null;
 
     public EcoTouchHandler(Thing thing) {
         super(thing);
     }
 
-    @Override
-    public void handleCommand(ChannelUID channelUID, Command command) {
-        if (CHANNEL_1.equals(channelUID.getId())) {
-            if (command instanceof RefreshType) {
-                // TODO: handle data refresh
+    private void updateChannel(String tag, String value_str)
+    {
+        try {
+            List<EcoTouchTags> ecoTouchTags = EcoTouchTags.fromTag(tag);
+            for (EcoTouchTags ecoTouchTag : ecoTouchTags) {
+                String channel = ecoTouchTag.getCommand();
+                BigDecimal value = ecoTouchTag.decodeValue(value_str);
+                if (ecoTouchTag.getUnit() != ONE) {
+                    // this is a quantity type
+                    QuantityType<?> quantity = new QuantityType(value, ecoTouchTag.getUnit());
+                    logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), quantity);
+                    updateState(channel, quantity);
+                } else {
+                    DecimalType number = new DecimalType(value);
+                    logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), number);
+                    updateState(channel, number);
+                }
             }
+        } catch (Exception e) {
 
-            // TODO: handle command
-
-            // Note: if communication with thing fails for some reason,
-            // indicate that by setting the status with detail information:
-            // updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR,
-            // "Could not control device at IP address x.x.x.x");
         }
     }
 
     @Override
+    public void handleCommand(ChannelUID channelUID, Command command) {
+        logger.debug("handleCommand()");
+        if (command instanceof RefreshType) {
+            // request a refresh of a channel
+            try {
+                EcoTouchTags tag = EcoTouchTags.fromString(channelUID.getId());
+                String value_str = connector.getValue_str(tag.getTagName());
+                updateChannel(tag.getTagName(), value_str);
+                updateStatus(ThingStatus.ONLINE);
+            }
+            catch (Exception e) {}
+        } else {
+            // send command to heat pump
+            logger.debug("handleCommand() no refresh");
+            try {
+                EcoTouchTags ecoTouchTag = EcoTouchTags.fromString(channelUID.getId());
+                if (ecoTouchTag.getPrimitiveTypeClass().equals(QuantityType.class)) {
+                    if (command instanceof QuantityType) {
+                        // convert from user unit to heat pump unit
+                        QuantityType value = (QuantityType) command;
+                        QuantityType raw_unit = value.toUnit(ecoTouchTag.getUnit());
+                        int raw = raw_unit.intValue();
+                        connector.setValue(ecoTouchTag.getTagName(), raw);
+                    } else {
+                        logger.debug("handleCommand: requires a QuantityType");
+                    }
+                } else {
+                    State state = (State) command;
+                    BigDecimal decimal = (state.as(DecimalType.class)).toBigDecimal();
+                    decimal = decimal.multiply(new BigDecimal(ecoTouchTag.getDivisor()));
+                    int raw = decimal.intValue();
+                    connector.setValue(ecoTouchTag.getTagName(), raw);
+                }
+            }
+            catch (Exception e) {
+                logger.debug("handleCommand: {}", e.toString());
+            }
+        }
+
+    }
+
+    @Override
     public void initialize() {
-        // logger.debug("Start initializing!");
+        logger.debug("Start initializing!");
         config = getConfigAs(EcoTouchConfiguration.class);
 
-        // TODO: Initialize the handler.
-        // The framework requires you to return from this method quickly. Also, before leaving this method a thing
-        // status from one of ONLINE, OFFLINE or UNKNOWN must be set. This might already be the real thing status in
-        // case you can decide it directly.
-        // In case you can not decide the thing status directly (e.g. for long running connection handshake using WAN
-        // access or similar) you should set status UNKNOWN here and then decide the real status asynchronously in the
-        // background.
+        connector = new EcoTouchConnector(config.ip, config.username, config.password);
 
-        // set the thing status to UNKNOWN temporarily and let the background task decide for the real status.
-        // the framework is then able to reuse the resources from the thing handler initialization.
-        // we set this upfront to reliably check status updates in unit tests.
         updateStatus(ThingStatus.UNKNOWN);
 
-        // Example for background initialization:
         scheduler.execute(() -> {
-            boolean thingReachable = true; // <background task with long running initialization here>
-            // when done do:
+            boolean thingReachable = true;
+            try {
+                // try to get a single value
+                connector.getValue_str("A1");
+            } catch (IOException io) {
+                updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, io.toString());
+                return;
+            } catch (Exception e) {
+                thingReachable = false;
+            }
+
             if (thingReachable) {
                 updateStatus(ThingStatus.ONLINE);
             } else {
@@ -87,12 +154,52 @@ public class EcoTouchHandler extends BaseThingHandler {
             }
         });
 
-        // logger.debug("Finished initializing!");
+        // start refresh handler
+        startAutomaticRefresh();
 
-        // Note: When initialization can NOT be done set the status with more details for further
-        // analysis. See also class ThingStatusDetail for all available status details.
-        // Add a description to give user information to understand why thing does not work as expected. E.g.
-        // updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR,
-        // "Can not access device as username and/or password are invalid");
+        logger.debug("Finished initializing!");
+    }
+
+    private void startAutomaticRefresh() {
+        if (refreshJob == null || refreshJob.isCancelled()) {
+            Runnable runnable = () -> {
+                logger.debug("startAutomaticRefresh");
+                try {
+                    Set<String> tags = new HashSet<String>();
+                    for (EcoTouchTags ecoTouchTag : EcoTouchTags.values()) {
+                        String channel = ecoTouchTag.getCommand();
+                        boolean linked = isLinked(channel);
+                        if (linked)
+                            tags.add(ecoTouchTag.getTagName());
+                    }
+                    logger.debug("request: {}", tags);
+                    Map<String, String> result = connector.getValues_str(tags);
+                    logger.debug("result: {}", result);
+
+                    Iterator<Map.Entry<String, String>> it = result.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry<String, String> pair = it.next();
+                        updateChannel(pair.getKey(), pair.getValue());
+                    }
+                } catch (IOException io) {
+                    updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.COMMUNICATION_ERROR, io.getMessage());
+                } catch (Exception e) {
+                    logger.error("Exception occurred during execution: {}", e.toString());
+                    updateStatus(ThingStatus.OFFLINE);
+                }
+            };
+
+            refreshJob = scheduler.scheduleWithFixedDelay(runnable, 0, config.refresh, TimeUnit.SECONDS);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        if (refreshJob != null && !refreshJob.isCancelled()) {
+            refreshJob.cancel(true);
+            refreshJob = null;
+        }
+        if (connector != null)
+            connector.logout();
     }
 }
