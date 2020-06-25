@@ -12,10 +12,13 @@
  */
 package org.openhab.binding.ecotouch.internal;
 
-import static org.openhab.binding.ecotouch.internal.EcoTouchBindingConstants.*;
+import static org.openhab.binding.ecotouch.internal.EcoTouchBindingConstants.THING_TYPE_AIR;
+import static org.openhab.binding.ecotouch.internal.EcoTouchBindingConstants.THING_TYPE_GEO;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -36,7 +39,8 @@ import org.osgi.service.component.annotations.Component;
 @Component(configurationPid = "binding.ecotouch", service = ThingHandlerFactory.class)
 public class EcoTouchHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_SAMPLE);
+    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections
+            .unmodifiableSet(Stream.of(THING_TYPE_GEO, THING_TYPE_AIR).collect(Collectors.toSet()));
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -47,7 +51,7 @@ public class EcoTouchHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (THING_TYPE_SAMPLE.equals(thingTypeUID)) {
+        if (THING_TYPE_GEO.equals(thingTypeUID) || THING_TYPE_AIR.equals(thingTypeUID)) {
             return new EcoTouchHandler(thing);
         }
 
