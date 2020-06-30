@@ -45,7 +45,7 @@ public class EcoTouchConnector {
     private String username;
     private String password;
     List<String> cookies;
-    static Pattern responsePattern = Pattern.compile("#(.+)\\s+S_OK[^0-9-]+([0-9-]+)\\s+([0-9-]+)");
+    static Pattern responsePattern = Pattern.compile("#(.+)\\s+S_OK[^0-9-]+([0-9-]+)\\s+([0-9-.]+)");
 
     private final Logger logger = LoggerFactory.getLogger(EcoTouchConnector.class);
 
