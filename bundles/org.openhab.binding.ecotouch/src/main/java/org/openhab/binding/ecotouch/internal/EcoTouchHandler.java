@@ -12,10 +12,12 @@
  */
 package org.openhab.binding.ecotouch.internal;
 
+import static org.eclipse.smarthome.core.library.unit.SIUnits.*;
 import static org.eclipse.smarthome.core.library.unit.SmartHomeUnits.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -67,15 +69,23 @@ public class EcoTouchHandler extends BaseThingHandler {
             for (EcoTouchTags ecoTouchTag : ecoTouchTags) {
                 String channel = ecoTouchTag.getCommand();
                 BigDecimal value = ecoTouchTag.decodeValue(value_str);
-                if (ecoTouchTag.getUnit() != ONE) {
-                    // this is a quantity type
-                    QuantityType<?> quantity = new QuantityType(value, ecoTouchTag.getUnit());
-                    logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), quantity);
+                if (ecoTouchTag == EcoTouchTags.TYPE_ADAPT_HEATING) {
+                    // this type needs special treatment
+                    // the following reads: value = value / 2 - 2
+                    value = value.divide(new BigDecimal(2), 1, RoundingMode.UNNECESSARY).subtract(new BigDecimal(2));
+                    QuantityType<?> quantity = new QuantityType(value, CELSIUS);
                     updateState(channel, quantity);
                 } else {
-                    DecimalType number = new DecimalType(value);
-                    logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), number);
-                    updateState(channel, number);
+                    if (ecoTouchTag.getUnit() != ONE) {
+                        // this is a quantity type
+                        QuantityType<?> quantity = new QuantityType(value, ecoTouchTag.getUnit());
+                        logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), quantity);
+                        updateState(channel, quantity);
+                    } else {
+                        DecimalType number = new DecimalType(value);
+                        logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), number);
+                        updateState(channel, number);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -100,22 +110,29 @@ public class EcoTouchHandler extends BaseThingHandler {
             logger.debug("handleCommand() no refresh");
             try {
                 EcoTouchTags ecoTouchTag = EcoTouchTags.fromString(channelUID.getId());
-                if (ecoTouchTag.getPrimitiveTypeClass().equals(QuantityType.class)) {
-                    if (command instanceof QuantityType) {
-                        // convert from user unit to heat pump unit
-                        QuantityType value = (QuantityType) command;
-                        QuantityType raw_unit = value.toUnit(ecoTouchTag.getUnit());
-                        int raw = raw_unit.intValue();
-                        connector.setValue(ecoTouchTag.getTagName(), raw);
-                    } else {
-                        logger.debug("handleCommand: requires a QuantityType");
-                    }
-                } else {
-                    State state = (State) command;
-                    BigDecimal decimal = (state.as(DecimalType.class)).toBigDecimal();
-                    decimal = decimal.multiply(new BigDecimal(ecoTouchTag.getDivisor()));
-                    int raw = decimal.intValue();
+                if (ecoTouchTag == EcoTouchTags.TYPE_ADAPT_HEATING) {
+                    // this type needs special treatment
+                    QuantityType value = (QuantityType) command;
+                    int raw = Math.round(value.floatValue() * 2 + 4);
                     connector.setValue(ecoTouchTag.getTagName(), raw);
+                } else {
+                    if (ecoTouchTag.getPrimitiveTypeClass().equals(QuantityType.class)) {
+                        if (command instanceof QuantityType) {
+                            // convert from user unit to heat pump unit
+                            QuantityType value = (QuantityType) command;
+                            QuantityType raw_unit = value.toUnit(ecoTouchTag.getUnit());
+                            int raw = raw_unit.intValue();
+                            connector.setValue(ecoTouchTag.getTagName(), raw);
+                        } else {
+                            logger.debug("handleCommand: requires a QuantityType");
+                        }
+                    } else {
+                        State state = (State) command;
+                        BigDecimal decimal = (state.as(DecimalType.class)).toBigDecimal();
+                        decimal = decimal.multiply(new BigDecimal(ecoTouchTag.getDivisor()));
+                        int raw = decimal.intValue();
+                        connector.setValue(ecoTouchTag.getTagName(), raw);
+                    }
                 }
             } catch (Exception e) {
                 logger.debug("handleCommand: {}", e.toString());
