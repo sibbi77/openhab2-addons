@@ -12,16 +12,17 @@
  */
 package org.openhab.binding.ecotouch.internal;
 
+import static org.eclipse.smarthome.core.library.unit.SmartHomeUnits.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.*;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.*;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
@@ -33,7 +34,6 @@ import org.eclipse.smarthome.core.types.RefreshType;
 import org.eclipse.smarthome.core.types.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.eclipse.smarthome.core.library.unit.SmartHomeUnits.*;
 
 /**
  * The {@link EcoTouchHandler} is responsible for handling commands, which are
@@ -54,15 +54,14 @@ public class EcoTouchHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(EcoTouchHandler.class);
 
     private @Nullable EcoTouchConfiguration config = null;
-    
+
     private @Nullable ScheduledFuture<?> refreshJob = null;
 
     public EcoTouchHandler(Thing thing) {
         super(thing);
     }
 
-    private void updateChannel(String tag, String value_str)
-    {
+    private void updateChannel(String tag, String value_str) {
         try {
             List<EcoTouchTags> ecoTouchTags = EcoTouchTags.fromTag(tag);
             for (EcoTouchTags ecoTouchTag : ecoTouchTags) {
@@ -94,8 +93,8 @@ public class EcoTouchHandler extends BaseThingHandler {
                 String value_str = connector.getValue_str(tag.getTagName());
                 updateChannel(tag.getTagName(), value_str);
                 updateStatus(ThingStatus.ONLINE);
+            } catch (Exception e) {
             }
-            catch (Exception e) {}
         } else {
             // send command to heat pump
             logger.debug("handleCommand() no refresh");
@@ -118,12 +117,10 @@ public class EcoTouchHandler extends BaseThingHandler {
                     int raw = decimal.intValue();
                     connector.setValue(ecoTouchTag.getTagName(), raw);
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 logger.debug("handleCommand: {}", e.toString());
             }
         }
-
     }
 
     @Override

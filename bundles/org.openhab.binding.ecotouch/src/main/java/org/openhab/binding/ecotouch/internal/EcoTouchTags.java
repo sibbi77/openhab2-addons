@@ -20,12 +20,9 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.smarthome.core.types.PrimitiveType;
-import org.eclipse.smarthome.core.library.types.DecimalType;
-import org.eclipse.smarthome.core.library.types.OnOffType;
-import org.eclipse.smarthome.core.library.types.QuantityType;
-
 import javax.measure.Unit;
+
+import org.eclipse.smarthome.core.library.types.QuantityType;
 
 /**
  * Represents all valid commands which could be processed by this binding
@@ -1012,7 +1009,6 @@ public enum EcoTouchTags {
         }
     },
 
-
     //
     // The following tags are only available, if an Ecovent System is attached to the Ecotouch
     //
@@ -1100,7 +1096,6 @@ public enum EcoTouchTags {
             divisor = 1;
         }
     },
-
 
     ;
 
@@ -1199,18 +1194,19 @@ public enum EcoTouchTags {
      * @return true if item class can bound to heatpumpCommand
      */
     // public static boolean validateBinding(EcoTouchTags bindingConfig, Class<? extends Item> itemClass) {
-    //     boolean ret = false;
-    //     for (EcoTouchTags c : EcoTouchTags.values()) {
-    //         if (c.getCommand().equals(bindingConfig.getCommand()) && c.getItemClass().equals(itemClass)) {
-    //             ret = true;
-    //             break;
-    //         }
-    //     }
-    //     return ret;
+    // boolean ret = false;
+    // for (EcoTouchTags c : EcoTouchTags.values()) {
+    // if (c.getCommand().equals(bindingConfig.getCommand()) && c.getItemClass().equals(itemClass)) {
+    // ret = true;
+    // break;
+    // }
+    // }
+    // return ret;
     // }
 
     /**
      * Decode a raw value from the heat pump's ethernet interface into a scaled value
+     * 
      * @param rawValue
      * @return
      */
@@ -1227,7 +1223,7 @@ public enum EcoTouchTags {
         BigDecimal result = raw.divide(new BigDecimal(divisor));
         return result;
     }
-    
+
     /**
      * Searches the available heat pump commands and returns the matching one.
      *

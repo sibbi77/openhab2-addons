@@ -16,15 +16,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -208,12 +207,12 @@ public class EcoTouchConnector {
      *            The registers to query (e.g. "A1")
      * @return values These values are 16-bit integers.
      */
-    public Map<String,String> getValues_str(Set<String> tags) throws Exception {
+    public Map<String, String> getValues_str(Set<String> tags) throws Exception {
         trylogin(false);
 
         final Integer maxNum = 100;
 
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String, String> result = new HashMap<String, String>();
         Integer counter = 1;
         StringBuilder query = new StringBuilder();
         Iterator<String> iter = tags.iterator();
@@ -221,7 +220,7 @@ public class EcoTouchConnector {
             query.append(String.format("t%d=%s&", counter, iter.next()));
             counter++;
             if (counter > maxNum) {
-                query.deleteCharAt(query.length()-1); // remove last '&'
+                query.deleteCharAt(query.length() - 1); // remove last '&'
                 String query_str = String.format("http://%s/cgi/readTags?n=%d&", ip, maxNum) + query;
                 result.putAll(getValues_str(query_str));
                 counter = 1;
@@ -230,14 +229,14 @@ public class EcoTouchConnector {
         }
 
         if (query.length() > 0) {
-            query.deleteCharAt(query.length()-1); // remove last '&'
-            String query_str = String.format("http://%s/cgi/readTags?n=%d&", ip, counter-1) + query;
+            query.deleteCharAt(query.length() - 1); // remove last '&'
+            String query_str = String.format("http://%s/cgi/readTags?n=%d&", ip, counter - 1) + query;
             result.putAll(getValues_str(query_str));
         }
 
         return result;
     }
-    
+
     /**
      * Send a request to the heat pump and evaluate the result
      * 
@@ -245,9 +244,9 @@ public class EcoTouchConnector {
      *            The URL to connect to
      * @return values A map of tags and their respective integer values
      */
-    private Map<String,String> getValues_str(String url) throws Exception {
+    private Map<String, String> getValues_str(String url) throws Exception {
         logger.debug("getValues({})", url);
-        Map<String,String> result = new HashMap<String,String>();
+        Map<String, String> result = new HashMap<String, String>();
         int loginAttempt = 0;
         while (loginAttempt < 2) {
             BufferedReader reader = null;
@@ -277,7 +276,7 @@ public class EcoTouchConnector {
                         result.put(tag, value);
                     }
                 }
-                
+
                 if (result.isEmpty()) {
                     // s.th. went wrong; try to log in again
                     throw new Exception();

@@ -30,7 +30,6 @@ public class EcoTouchBindingConstants {
     public static final ThingTypeUID THING_TYPE_GEO = new ThingTypeUID(BINDING_ID, "geo");
     public static final ThingTypeUID THING_TYPE_AIR = new ThingTypeUID(BINDING_ID, "air");
 
-
     // List of all Channel ids
     public static final String CHANNEL_temperature_outside = "temperature_outside";
     public static final String CHANNEL_temperature_outside_1h = "temperature_outside_1h";
