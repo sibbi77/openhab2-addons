@@ -22,8 +22,6 @@ import java.util.List;
 
 import javax.measure.Unit;
 
-import org.eclipse.smarthome.core.library.types.QuantityType;
-
 /**
  * Represents all valid commands which could be processed by this binding
  *
@@ -1110,7 +1108,6 @@ public enum EcoTouchTags {
      */
     String tagName;
 
-    Class<?> primitiveTypeClass = QuantityType.class;
     Unit<?> unit = ONE;
 
     /**
@@ -1179,10 +1176,6 @@ public enum EcoTouchTags {
 
     public Unit<?> getUnit() {
         return unit;
-    }
-
-    public Class<?> getPrimitiveTypeClass() {
-        return primitiveTypeClass;
     }
 
     /**
