@@ -82,6 +82,7 @@ public class EcoTouchHandler extends BaseThingHandler {
                         logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), quantity);
                         updateState(channel, quantity);
                     } else {
+                        value = value.multiply(new BigDecimal(ecoTouchTag.getDivisor()));
                         DecimalType number = new DecimalType(value);
                         logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), number);
                         updateState(channel, number);
