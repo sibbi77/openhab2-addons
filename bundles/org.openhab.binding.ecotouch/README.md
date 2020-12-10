@@ -1,18 +1,19 @@
 # EcoTouch Binding
 
-_Give some details about what this binding is meant for - a protocol, system, specific device._
-
-_If possible, provide some resources like pictures, a YouTube video, etc. to give an impression of what can be done with this binding. You can place such resources into a `doc` folder next to this README.md._
+The openHAB EcoTouch binding allows interaction with a [Waterkotte](https://www.waterkotte.de/) heat pump.
 
 ## Supported Things
 
-_Please describe the different supported things / devices within this section._
-_Which different types are supported, which models were tested etc.?_
-_Note that it is planned to generate some part of this based on the XML files within ```src/main/resources/ESH-INF/thing``` of your binding._
+| Thing type      | Description                                      |
+|-----------------|--------------------------------------------------|
+| geo             | Waterkotte EcoTouch Geo + EcoVent                |
+| air             | Waterkotte EcoTouch Air + EcoVent                |
+
+This binding was tested with a Waterkotte DS 5027 Ai DS 5010.5Ai geothermal heat pump).
 
 ## Discovery
 
-_Describe the available auto-discovery features here. Mention for what it works and what needs to be kept in mind when using it._
+Discovery is not supported. You need to provide the IP address of the display unit of the heatpump.
 
 ## Binding Configuration
 
