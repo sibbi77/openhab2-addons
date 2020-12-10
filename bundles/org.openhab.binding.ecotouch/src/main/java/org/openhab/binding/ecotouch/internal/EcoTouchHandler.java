@@ -122,6 +122,7 @@ public class EcoTouchHandler extends BaseThingHandler {
                             QuantityType value = (QuantityType) command;
                             QuantityType raw_unit = value.toUnit(ecoTouchTag.getUnit());
                             int raw = raw_unit.intValue();
+                            raw *= ecoTouchTag.getDivisor();
                             connector.setValue(ecoTouchTag.getTagName(), raw);
                         } else {
                             logger.debug("handleCommand: requires a QuantityType");
