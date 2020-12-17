@@ -314,6 +314,7 @@ public class EcoTouchConnector {
 
         // set value
         String url = "http://" + ip + "/cgi/writeTags?returnValue=true&n=1&t1=" + tag + "&v1=" + value;
+        logger.debug("setValue() url: '{}'", url);
         StringBuilder body = null;
         int loginAttempt = 0;
         while (loginAttempt < 2) {
@@ -369,6 +370,7 @@ public class EcoTouchConnector {
             throw new Exception("invalid response from EcoTouch");
         }
 
+        logger.debug("response: '{}'", body.toString());
         return Integer.parseInt(m.group(3));
     }
 
