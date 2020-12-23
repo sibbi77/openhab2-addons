@@ -73,12 +73,12 @@ public class EcoTouchHandler extends BaseThingHandler {
                     // this type needs special treatment
                     // the following reads: value = value / 2 - 2
                     value = value.divide(new BigDecimal(2), 1, RoundingMode.UNNECESSARY).subtract(new BigDecimal(2));
-                    QuantityType<?> quantity = new QuantityType(value, CELSIUS);
+                    QuantityType<?> quantity = new QuantityType<javax.measure.quantity.Temperature>(value, CELSIUS);
                     updateState(channel, quantity);
                 } else {
                     if (ecoTouchTag.getUnit() != ONE) {
                         // this is a quantity type
-                        QuantityType<?> quantity = new QuantityType(value, ecoTouchTag.getUnit());
+                        QuantityType<?> quantity = new QuantityType<>(value, ecoTouchTag.getUnit());
                         logger.debug("refresh: {} = {}", ecoTouchTag.getTagName(), quantity);
                         updateState(channel, quantity);
                     } else {
@@ -112,15 +112,15 @@ public class EcoTouchHandler extends BaseThingHandler {
                 EcoTouchTags ecoTouchTag = EcoTouchTags.fromString(channelUID.getId());
                 if (ecoTouchTag == EcoTouchTags.TYPE_ADAPT_HEATING) {
                     // this type needs special treatment
-                    QuantityType value = (QuantityType) command;
+                    QuantityType<?> value = (QuantityType<?>) command;
                     int raw = Math.round(value.floatValue() * 2 + 4);
                     connector.setValue(ecoTouchTag.getTagName(), raw);
                 } else {
                     if (ecoTouchTag.getUnit() != ONE) {
                         if (command instanceof QuantityType) {
                             // convert from user unit to heat pump unit
-                            QuantityType value = (QuantityType) command;
-                            QuantityType raw_unit = value.toUnit(ecoTouchTag.getUnit());
+                            QuantityType<?> value = (QuantityType<?>) command;
+                            QuantityType<?> raw_unit = value.toUnit(ecoTouchTag.getUnit());
                             int raw = raw_unit.intValue();
                             raw *= ecoTouchTag.getDivisor();
                             connector.setValue(ecoTouchTag.getTagName(), raw);
