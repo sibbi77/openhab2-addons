@@ -467,14 +467,14 @@
 		<category>Temperature</category>
 		<state readOnly="true" pattern="%.1f %unit%"/>
 	</channel-type>
-	<channel-type id="temperature_heating_set" advanced="true">
+	<channel-type id="temperature_heating_set">
 		<item-type>Number:Temperature</item-type>
 		<label>Temperature Heating Setpoint</label>
 		<description></description>
 		<category>Temperature</category>
 		<state readOnly="true" pattern="%.1f %unit%"/>
 	</channel-type>
-	<channel-type id="temperature_heating_set2">
+	<channel-type id="temperature_heating_set2" advanced="true">
 		<item-type>Number:Temperature</item-type>
 		<label>Temperature Heating Setpoint BMS</label>
 		<description></description>
