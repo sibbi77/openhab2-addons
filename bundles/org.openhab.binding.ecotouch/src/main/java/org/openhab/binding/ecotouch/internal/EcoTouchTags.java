@@ -460,6 +460,15 @@ public enum EcoTouchTags {
         }
     },
 
+    // German: Raum Soll
+    TYPE_TEMP_ROOM_SET {
+        {
+            command = "tempRoomSet";
+            unit = CELSIUS;
+            tagName = "A100";
+        }
+    },
+
     // German: undokumentiert: Kühlen Einschalt-Temp. Aussentemp (??)
     TYPE_COOLENABLETEMP {
         {
@@ -872,6 +881,17 @@ public enum EcoTouchTags {
         }
     },
 
+    // German: Raumeinfluss
+    TYPE_TEMP_ROOM_INFLUENCE {
+        {
+            command = "tempRoomInfluence";
+            divisor = 1;
+            tagName = "I264";
+            type = Type.Word; // value range 0..4 => 0%, 50%, 100%, 150%, 200%
+        }
+    },
+    
+    
     // German: Handschaltung Heizungspumpe (H-0-A)
     // H:Handschaltung Ein 0:Aus A:Automatik
     // Kodierung: 0:? 1:? 2:Automatik
