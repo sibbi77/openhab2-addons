@@ -890,8 +890,7 @@ public enum EcoTouchTags {
             type = Type.Word; // value range 0..4 => 0%, 50%, 100%, 150%, 200%
         }
     },
-    
-    
+
     // German: Handschaltung Heizungspumpe (H-0-A)
     // H:Handschaltung Ein 0:Aus A:Automatik
     // Kodierung: 0:? 1:? 2:Automatik
