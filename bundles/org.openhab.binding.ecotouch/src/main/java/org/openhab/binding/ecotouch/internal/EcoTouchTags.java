@@ -12,9 +12,9 @@
  */
 package org.openhab.binding.ecotouch.internal;
 
-import static org.eclipse.smarthome.core.library.unit.MetricPrefix.*;
-import static org.eclipse.smarthome.core.library.unit.SIUnits.*;
-import static org.eclipse.smarthome.core.library.unit.SmartHomeUnits.*;
+import static org.openhab.core.library.unit.MetricPrefix.*;
+import static org.openhab.core.library.unit.SIUnits.*;
+import static org.openhab.core.library.unit.SmartHomeUnits.*;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
