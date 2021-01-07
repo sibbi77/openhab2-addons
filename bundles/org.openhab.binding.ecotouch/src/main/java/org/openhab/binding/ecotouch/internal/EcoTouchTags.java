@@ -1114,6 +1114,17 @@ public enum EcoTouchTags {
         }
     },
 
+    TYPE_ECOVENT_MODE {
+        {
+            command = "ecovent_mode";
+            tagName = "I4582";
+            type = Type.Word; // Type.Enum;
+            divisor = 1;
+            stringEnum = new String[] { "Day Mode", "Night Mode", "Timer Mode", "Party Mode", "Vacation Mode",
+                    "Bypass Mode" };
+        }
+    },
+
     ;
 
     /**
@@ -1138,7 +1149,8 @@ public enum EcoTouchTags {
         Analog,
         Word,
         Bitfield,
-        Float
+        Float,
+        Enum
     };
 
     /**
@@ -1156,6 +1168,11 @@ public enum EcoTouchTags {
      * Defaults to 10 and should be a power of 10 (e.g. 10, 100, 1000).
      */
     int divisor = 10;
+
+    /**
+     * If \c type is Type.Enum, this defines the meaning of the values (0-based)
+     */
+    String[] stringEnum = null;
 
     /**
      * @return command name (uses in *.items files)

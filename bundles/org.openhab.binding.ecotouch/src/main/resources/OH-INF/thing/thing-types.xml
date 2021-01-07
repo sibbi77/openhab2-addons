@@ -117,6 +117,7 @@
 			<channel id="ecovent_CO2_value" typeId="ecovent_CO2_value"/>
 			<channel id="ecovent_moisture_value" typeId="ecovent_moisture_value"/>
 			<channel id="ecovent_output_y1" typeId="ecovent_output_y1"/>
+			<channel id="ecovent_mode" typeId="ecovent_mode"/>
 		</channels>
 
 		<config-description>
@@ -260,6 +261,7 @@
 			<channel id="ecovent_CO2_value" typeId="ecovent_CO2_value"/>
 			<channel id="ecovent_moisture_value" typeId="ecovent_moisture_value"/>
 			<channel id="ecovent_output_y1" typeId="ecovent_output_y1"/>
+			<channel id="ecovent_mode" typeId="ecovent_mode"/>
 		</channels>
 
 		<config-description>
@@ -991,6 +993,12 @@
 		<label>EcoVent Fan</label>
 		<description></description>
 		<state readOnly="true" pattern="%.1f %unit%"/>
+	</channel-type>
+	<channel-type id="ecovent_mode">
+		<item-type>Number:Dimensionless</item-type>
+		<label>EcoVent Mode</label>
+		<description></description>
+		<state min="0" max="5" step="1" readOnly="false"/>
 	</channel-type>
 
 
