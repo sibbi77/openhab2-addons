@@ -201,6 +201,12 @@ public class EcoTouchHandler extends BaseThingHandler {
                 } catch (Exception e) {
                     logger.error("Exception occurred during execution: {}", e.toString());
                     updateStatus(ThingStatus.OFFLINE);
+                } catch (Error e) {
+                    // during thing creation, the following error is thrown:
+                    // java.lang.NoSuchMethodError: 'org.openhab.binding.ecotouch.internal.EcoTouchTags[]
+                    // org.openhab.binding.ecotouch.internal.EcoTouchTags.values()'
+                    // not sure why... lets ignore it for now
+                    updateStatus(ThingStatus.OFFLINE);
                 }
             };
 
