@@ -13,7 +13,7 @@
 package org.openhab.binding.ecotouch.internal;
 
 import static org.openhab.core.library.unit.SIUnits.*;
-import static org.openhab.core.library.unit.SmartHomeUnits.*;
+import static org.openhab.core.library.unit.Units.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
