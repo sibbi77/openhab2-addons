@@ -37,7 +37,7 @@ public class TapoThingConstants {
     public static final String DEVICE_P100 = "P100";
     public static final String DEVICE_P105 = "P105";
     public static final String DEVICE_L510E = "L510_Series";
-    public static final String DEVICE_L530E = "L530_Series";
+    public static final String DEVICE_L530E = "L530";
     public static final String DEVICE_L900 = "L900";
     public static final String DEVICE_UNIVERSAL = "Test_Device";
 
